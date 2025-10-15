@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Task Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff5171;
+            --primary-dark: #E55A2B;
+            --secondary: #FFA62B;
+            --accent: #FFD166;
+            --light: #FFF8F0;
+            --dark: #2D3047;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --text: #5D4037;
+            --border: #FFE0B2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(145deg, #fff0ec 0%, #fd9757 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(255, 107, 53, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--light);
+            color: var(--text);
+        }
+
+        textarea {
+            padding-left: 50px;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+            background: white;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn i {
+            font-size: 1.2rem;
+        }
+
+        #results {
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: var(--dark);
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .results-body {
+            padding: 30px;
+            background: var(--light);
+            border-radius: 0 0 15px 15px;
+            border: 2px solid var(--border);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .task-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .task-card.priority-high {
+            border-left-color: var(--danger);
+        }
+
+        .task-card.priority-medium {
+            border-left-color: var(--warning);
+        }
+
+        .task-card.priority-low {
+            border-left-color: var(--success);
+        }
+
+        .task-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .task-number {
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .task-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+            flex: 1;
+        }
+
+        .task-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .priority-high {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+
+        .priority-medium {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .priority-low {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .task-description {
+            color: var(--text);
+            margin-bottom: 15px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .task-details {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .task-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .task-detail i {
+            color: var(--primary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            header {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 25px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .task-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-priority {
+                margin-top: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> Smart Task Planner</h1>
+            <p class="subtitle">Transform your goals into actionable plans with AI</p>
+        </header>
+
+        <div class="main-content">
+            <div class="form-group">
+                <label for="goal"><i class="fas fa-bullseye"></i> Your Goal</label>
+                <div class="input-group">
+                    <div class="input-icon">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <textarea id="goal" placeholder="What do you want to achieve?">Learn Python in 1 month</textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="timeframe"><i class="fas fa-calendar-alt"></i> Timeframe (optional)</label>
+                <div class="input-group">
+                    <div class="input-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <input type="text" id="timeframe" placeholder="e.g., 2 weeks, 1 month, 3 months" value="1 month">
+                </div>
+            </div>
+
+            <button class="btn pulse" onclick="generatePlan()">
+                <i class="fas fa-magic"></i> Generate Smart Plan
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>AI is crafting your perfect plan...</p>
+            </div>
+
+            <div id="results" style="display: none;">
+                <div class="results-header">
+                    <h2><i class="fas fa-rocket"></i> Your Action Plan</h2>
+                </div>
+                <div class="results-body">
+                    <div id="reasoning"></div>
+                    <div class="stats" id="stats"></div>
+                    <div class="task-grid" id="tasks"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generatePlan() {
+            const goal = document.getElementById('goal').value;
+            const timeframe = document.getElementById('timeframe').value;
+            
+            if (!goal.trim()) {
+                alert('Please enter a goal to get started!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/breakdown', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        goal: goal,
+                        timeframe: timeframe
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate plan. Please check if the backend is running.');
+                }
+
+                const data = await response.json();
+                
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                
+                // Display results
+                displayResults(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('Error generating plan: ' + error.message);
+            }
+        }
+
+        function displayResults(data) {
+            // Display reasoning
+            document.getElementById('reasoning').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value"><i class="fas fa-brain"></i> AI Analysis</div>
+                    <p>${data.reasoning}</p>
+                </div>
+            `;
+
+            // Display stats
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${data.tasks.length}</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${data.total_estimated_hours}</div>
+                    <div class="stat-label">Estimated Hours</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${Math.ceil(data.total_estimated_hours / 8)}</div>
+                    <div class="stat-label">Working Days</div>
+                </div>
+            `;
+
+            // Display tasks
+            const tasksContainer = document.getElementById('tasks');
+            tasksContainer.innerHTML = '';
+            
+            data.tasks.forEach((task, index) => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-card priority-${task.priority}`;
+                
+                taskElement.innerHTML = `
+                    <div class="task-header">
+                        <div class="task-number">${index + 1}</div>
+                        <div style="flex: 1;">
+                            <div class="task-title">${task.title}</div>
+                        </div>
+                        <div class="task-priority priority-${task.priority}">
+                            ${task.priority} priority
+                        </div>
+                    </div>
+                    <div class="task-description">${task.description}</div>
+                    <div class="task-details">
+                        <div class="task-detail">
+                            <i class="fas fa-clock"></i>
+                            <span>${task.estimated_hours} hours</span>
+                        </div>
+                        <div class="task-detail">
+                            <i class="fas fa-flag"></i>
+                            <span>${task.status}</span>
+                        </div>
+                    </div>
+                `;
+                
+                tasksContainer.appendChild(taskElement);
+            });
+
+            // Show results with animation
+            document.getElementById('results').style.display = 'block';
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Auto-generate plan when page loads
+        window.onload = function() {
+            generatePlan();
+        };
+    </script>
+</body>
+</html>
