@@ -16,18 +16,15 @@ Smart Task Planner is a full-stack web application that uses AI to transform use
 - Clean, responsive user interface
 - Real-time plan generation
 
-## Project Structure
-
-```
 smart-task-planner/
 ├── backend/
 │   ├── app/
 │   │   └── main.py
-│   └── requirements.txt
+│   ├── requirements.txt
+│   └── test_gemini.py
 ├── frontend/
 │   └── test.html
 └── README.md
-```
 
 ## Technology Stack
 
